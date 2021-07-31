@@ -1,10 +1,9 @@
 package com.anushka.androidtutz.contactmanager;
 
+import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -13,26 +12,28 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anushka.androidtutz.contactmanager.adapter.ContactsAdapter;
-import com.anushka.androidtutz.contactmanager.db.DatabaseHelper;
+import com.anushka.androidtutz.contactmanager.db.ContactsAppDatabase;
 import com.anushka.androidtutz.contactmanager.db.entity.Contact;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private ContactsAdapter contactsAdapter;
     private ArrayList<Contact> contactArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private DatabaseHelper db;
+
+    private ContactsAppDatabase contactsAppDatabase;
+
+//    private DatabaseHelper db;
 
 
     @Override
@@ -44,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(" Contacts Manager");
 
         recyclerView = findViewById(R.id.recycler_view_contacts);
-        db = new DatabaseHelper(this);
+//        db = new DatabaseHelper(this);
 
-        contactArrayList.addAll(db.getAllContacts());
+        contactsAppDatabase = Room.databaseBuilder(getApplicationContext(), ContactsAppDatabase.class, "ContactsDB").allowMainThreadQueries().build();
+
+        contactArrayList.addAll(contactsAppDatabase.getContactDao().getAllContacts());
 
         contactsAdapter = new ContactsAdapter(this, contactArrayList, MainActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     private void deleteContact(Contact contact, int position) {
 
         contactArrayList.remove(position);
-        db.deleteContact(contact);
+        contactsAppDatabase.getContactDao().deleteContact(contact);
         contactsAdapter.notifyDataSetChanged();
     }
 
@@ -169,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         contact.setName(name);
         contact.setEmail(email);
 
-        db.updateContact(contact);
+        contactsAppDatabase.getContactDao().updateContact(contact);
 
         contactArrayList.set(position, contact);
 
@@ -180,10 +183,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void createContact(String name, String email) {
 
-        long id = db.insertContact(name, email);
+        long id =contactsAppDatabase.getContactDao().addContact(new Contact(0,name,email));
 
 
-        Contact contact = db.getContact(id);
+        Contact contact = contactsAppDatabase.getContactDao().getContact(id);
 
         if (contact != null) {
 
