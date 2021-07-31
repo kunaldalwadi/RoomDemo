@@ -2,6 +2,7 @@ package com.anushka.androidtutz.contactmanager;
 
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         contactsAppDatabase = Room.databaseBuilder(getApplicationContext(), ContactsAppDatabase.class, "ContactsDB").allowMainThreadQueries().build();
 
-        contactArrayList.addAll(contactsAppDatabase.getContactDao().getAllContacts());
+        new GetAllContactsAsyncTask().execute();
 
         contactsAdapter = new ContactsAdapter(this, contactArrayList, MainActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -196,4 +197,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
+    private class GetAllContactsAsyncTask extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            contactArrayList.addAll(contactsAppDatabase.getContactDao().getAllContacts());
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            contactsAdapter.notifyDataSetChanged();
+        }
+    }
+
 }
