@@ -1,18 +1,32 @@
 package com.anushka.androidtutz.contactmanager.db.entity;
 
+
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
+@Entity(tableName = "contacts")
 public class Contact {
 
-    public static final String TABLE_NAME = "contacts";
+//    public static final String TABLE_NAME = "contacts";
 
     public static final String COLUMN_ID = "contact_id";
     public static final String COLUMN_NAME = "contact_name";
     public static final String COLUMN_EMAIL = "contact_email";
 
-    private String name;
-    private String email;
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = COLUMN_ID)
     private long id;
 
+    @ColumnInfo(name = COLUMN_NAME)
+    private String name;
 
+    @ColumnInfo(name = COLUMN_EMAIL)
+    private String email;
+
+
+    @Ignore
     public Contact() {
     }
 
@@ -49,11 +63,11 @@ public class Contact {
     }
 
 
-    // Create table SQL query
-    public static final String CREATE_TABLE =
-            "CREATE TABLE " + TABLE_NAME + "("
-                    + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + COLUMN_NAME + " TEXT,"
-                    + COLUMN_EMAIL + " DATETIME DEFAULT CURRENT_TIMESTAMP"
-                    + ")";
+//    // Create table SQL query
+//    public static final String CREATE_TABLE =
+//            "CREATE TABLE " + TABLE_NAME + "("
+//                    + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+//                    + COLUMN_NAME + " TEXT,"
+//                    + COLUMN_EMAIL + " DATETIME DEFAULT CURRENT_TIMESTAMP"
+//                    + ")";
 }
